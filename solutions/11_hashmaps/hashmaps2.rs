@@ -29,9 +29,8 @@ fn fruit_basket(basket: &mut HashMap<Fruit, u32>) {
     ];
 
     for fruit in fruit_kinds {
-        if fruit != Fruit::Apple && fruit != Fruit::Mango && fruit != Fruit::Lychee {
-            basket.insert(fruit, 1);
-        }
+        // If fruit doesn't exist, insert it with some value.
+        basket.entry(fruit).or_insert(5);
     }
 }
 

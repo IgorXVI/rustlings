@@ -5,9 +5,8 @@ trait AppendBar {
 }
 
 impl AppendBar for String {
-    fn append_bar(mut self) -> Self {
-        self = self + "Bar";
-        self
+    fn append_bar(self) -> Self {
+        self + "Bar"
     }
 }
 

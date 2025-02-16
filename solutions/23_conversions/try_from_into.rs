@@ -23,85 +23,42 @@ enum IntoColorError {
     IntConversion,
 }
 
-fn is_in_range(color_num: i16) -> bool {
-    color_num < 255 && color_num >= 0
-}
-
-fn are_all_valid(r: i16, g: i16, b: i16) -> bool {
-    is_in_range(r) && is_in_range(g) && is_in_range(b)
-}
-
-// TODO: Tuple implementation.
-// Correct RGB color values must be integers in the 0..=255 range.
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
 
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
-        if !are_all_valid(tuple.0, tuple.1, tuple.2) {
+        let (Ok(red), Ok(green), Ok(blue)) = (
+            u8::try_from(tuple.0),
+            u8::try_from(tuple.1),
+            u8::try_from(tuple.2),
+        ) else {
             return Err(IntoColorError::IntConversion);
-        }
-        Ok(Self {
-            red: tuple.0 as u8,
-            green: tuple.1 as u8,
-            blue: tuple.2 as u8,
-        })
+        };
+
+        Ok(Self { red, green, blue })
     }
 }
 
-// TODO: Array implementation.
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
 
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
-        let mut arr_iter = arr.iter();
-
-        let (Some(r), Some(g), Some(b), None) = (
-            arr_iter.next(),
-            arr_iter.next(),
-            arr_iter.next(),
-            arr_iter.next(),
-        ) else {
-            return Err(IntoColorError::BadLen);
-        };
-
-        if !are_all_valid(*r, *g, *b) {
-            return Err(IntoColorError::IntConversion);
-        }
-
-        Ok(Self {
-            red: *r as u8,
-            green: *g as u8,
-            blue: *b as u8,
-        })
+        // Reuse the implementation for a tuple.
+        Self::try_from((arr[0], arr[1], arr[2]))
     }
 }
 
-// TODO: Slice implementation.
-// This implementation needs to check the slice length.
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
 
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
-        let mut slice_iter = slice.iter();
-
-        let (Some(r), Some(g), Some(b), None) = (
-            slice_iter.next(),
-            slice_iter.next(),
-            slice_iter.next(),
-            slice_iter.next(),
-        ) else {
+        // Check the length.
+        if slice.len() != 3 {
             return Err(IntoColorError::BadLen);
-        };
-
-        if !are_all_valid(*r, *g, *b) {
-            return Err(IntoColorError::IntConversion);
         }
 
-        Ok(Self {
-            red: *r as u8,
-            green: *g as u8,
-            blue: *b as u8,
-        })
+        // Reuse the implementation for a tuple.
+        Self::try_from((slice[0], slice[1], slice[2]))
     }
 }
 
